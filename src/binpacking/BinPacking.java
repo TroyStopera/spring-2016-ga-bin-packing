@@ -58,15 +58,17 @@ public class BinPacking {
 
         //create P(0) if empty
         if (sortedPopulation.isEmpty())
-            for (int i = 0; i < genetics.popSize; i++)
+            for (int i = 0; i < genetics.popSize; i++) {
                 sortedPopulation.add(generateRandomSolution(elements, binCapacity));
+                sortedPopulation.add(generateRandomSolution(elements, binCapacity));
+            }
 
         //keeps track of current best so that new generations can't remove the best
         Solution overallBest = sortedPopulation.first();
 
         //begin breeding
         while (System.currentTimeMillis() - startTime < timeout) {
-            TreeSet<Solution> nextPopulation = new TreeSet<>();
+            List<Solution> nextPopulation = new ArrayList<>();
 
             //if dominance is in effect, start with the most fit solutions
             if (genetics.domRate > 0 && genetics.dominants > 0) {
@@ -82,7 +84,7 @@ public class BinPacking {
                 //loop through each harem size until it's 0
                 for (int harem = (int) (genetics.popSize * genetics.domRate); harem > 0; harem--) {
                     //if all dominants have been processed or the population is full, break
-                    if (dominants.size() > genetics.dominants || nextPopulation.size() >= genetics.popSize) break;
+                    if (!(iterator.hasNext()) || dominants.size() > genetics.dominants || nextPopulation.size() >= genetics.popSize) break;
 
                     //get the next dominant
                     Solution nextDominant = iterator.next();
@@ -104,18 +106,32 @@ public class BinPacking {
                 List<Solution> pop = new ArrayList<>(sortedPopulation);
 
                 int index1 = random.nextInt(pop.size());
-                int index2 = random.nextInt(pop.size());
+                int index2 = random.nextInt(pop.size());;
                 //ensure a solution doesn't mate with itself
+                /*do {
+                    index2 = random.nextInt(pop.size());
+                } while (index1 == index2);*/
+
                 if (index1 == index2) index2 = (index2 == 0) ? (index2 + 1) : (index2 - 1);
 
                 Solution child = Crossover.mate(pop.get(index1), pop.get(index2));
                 if (random.nextDouble() <= genetics.mutationRate)
                     Crossover.mutate(child);
+
                 nextPopulation.add(child);
             }
 
             //check the currentBest in this next population and if it is better than overallBest, replace
-            Solution currentBest = nextPopulation.first();
+            //Solution currentBest = nextPopulation.first();
+
+            Solution currentBest = nextPopulation.get(0);
+
+            for(Solution pBS : nextPopulation) {
+                if(pBS.getFitness() > currentBest.getFitness()) {
+                    currentBest = pBS;
+                }
+            }
+
             if (currentBest.getFitness() >= overallBest.getFitness()) overallBest = currentBest;
         }
 
