@@ -5,6 +5,9 @@ import java.util.Random;
 public class AlgTest {
 
     private Random rand = new Random();
+
+    // These values are defaults, and can be changed by values passed when the
+    // the object is initiated.
     private int binSize = 100;
     private long timeout = 1000;
     private int numTrials = 25;
@@ -29,7 +32,7 @@ public class AlgTest {
             + "\nMutation Rate: " + muRate
             + "\n\n");
 
-        for(int i = 100; i <= 1000; i *= 10) {
+        for(int i = 1000; i <= 1000; i *= 10) {
 
             int[] trialResults = new int[numTrials];
 
@@ -59,7 +62,7 @@ public class AlgTest {
             double aveBins = ((double)trialResultsSum) / ((double)numTrials);
 
             // Print results.
-            System.out.println(i + " elements: " + aveBins + " average bins");
+            System.out.print(i + " elements: " + aveBins + " average bins\n\n\n");
         }
     }
 }
